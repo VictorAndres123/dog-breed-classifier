@@ -1,0 +1,14 @@
+[project]
+name = "dog-breed-classifier"
+version = "1.0.0"
+requires-python = ">=3.11,<3.12"
+
+dependencies = [
+    "streamlit",
+    "tensorflow-cpu==2.14.1",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "scikit-learn",
+    "Pillow"
+]
