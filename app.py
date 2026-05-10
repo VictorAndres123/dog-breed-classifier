@@ -229,7 +229,7 @@ if uploaded_file is not None:
     # 🧠 Procesamiento
     image_resized = image.resize(IMG_SIZE)
     image_array = np.array(image_resized)
-    image_array = image_array / 255.0
+    image_array = np.array(image_resized, dtype=np.float32)
     image_array = np.expand_dims(image_array, axis=0)
 
     # Predicción
