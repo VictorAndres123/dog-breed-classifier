@@ -1,9 +1,15 @@
 import tensorflow as tf
 
+print("TF version:", tf.__version__)
+print("Keras version:", tf.keras.__version__)
+
 # Cargar modelo original
-model = tf.keras.models.load_model("models/dog_classifier.keras")
+model = tf.keras.models.load_model(
+    "models/dog_classifier.keras",
+    compile=False
+)
 
-# Guardarlo nuevamente en formato compatible
-model.save("models/dog_classifier_fixed.h5")
+# Reexportar en formato .keras limpio
+model.save("models/dog_classifier_fixed.keras")
 
-print("Modelo convertido correctamente")
+print("✅ Modelo reexportado correctamente")

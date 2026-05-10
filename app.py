@@ -101,9 +101,9 @@ breed_info = {
 def load_model():
 
     model = tf.keras.models.load_model(
-        "models/dog_classifier.keras",
-        compile=False
-    )
+    "models/dog_classifier_fixed.keras",
+    compile=False  # ya lo tienes, bien ✅
+)
 
     return model
 
