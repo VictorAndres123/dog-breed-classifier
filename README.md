@@ -1601,9 +1601,9 @@ de entrenar desde cero o tener millones de imágenes.
 ═══════════════════════════════════════════════════════════════════════════════
 
 Proyecto desarrollado como parte del programa de:
-Ingeniería de Sistemas - Universidad [Nombre]
+Ingeniería de Sistemas - Universidad Corhuila
 
-GitHub: https://github.com/usuario/dog-breed-classifier
+GitHub: https://github.com/VictorAndres123/dog-breed-classifier
 
 ═══════════════════════════════════════════════════════════════════════════════
 📄 LICENCIA
