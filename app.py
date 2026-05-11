@@ -207,6 +207,7 @@ if uploaded_file is not None or camera_image is not None:
     confidence = np.max(prediction)
 
     # 📊 RESULTADOS
+        # 📊 RESULTADOS
     with col2:
 
         st.markdown("## 🎯 Prediction")
@@ -225,6 +226,40 @@ if uploaded_file is not None or camera_image is not None:
             st.warning(
                 "⚠️ The model is not very confident about this prediction."
             )
+
+        # 🐾 PREGUNTAS SOBRE LA RAZA
+
+        st.markdown("## 🐾 Ask About This Breed")
+
+        questions = {
+            "🌍 Origin":
+                "This breed has origins linked to specific regions and was bred for companionship, hunting or work.",
+
+            "⏳ Life Span":
+                "Average life expectancy is usually between 10 and 15 years depending on health and care.",
+
+            "🏙️ Better for City or Countryside?":
+                "Some dogs adapt better to apartments while others need large open spaces and lots of activity.",
+
+            "👨‍👩‍👧 Good With Kids?":
+                "Most of these breeds are affectionate and protective with families when properly trained.",
+
+            "🏃 Exercise Needs":
+                "Daily exercise is important. Active breeds may require long walks and outdoor activities.",
+
+            "🧠 Intelligence":
+                "This breed is known for learning ability, obedience and adaptability.",
+
+            "🛡️ Temperament":
+                "Temperament can range from calm and friendly to protective and energetic."
+        }
+
+        selected_question = st.selectbox(
+            "Choose a question:",
+            list(questions.keys())
+        )
+
+        st.info(questions[selected_question])
 
         # 🐾 PREGUNTAS SOBRE LA RAZA
 
