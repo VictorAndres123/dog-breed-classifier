@@ -208,30 +208,47 @@ if uploaded_file is not None or camera_image is not None:
 
     # 📊 RESULTADOS
 
-    with col2:
+with col2:
 
-        st.markdown("## 🎯 Prediction")
+    st.markdown("## 🎯 Prediction")
 
-        st.success(
-            f"### {predicted_class.replace('_', ' ').title()}"
+    st.success(
+        f"### {predicted_class.replace('_', ' ').title()}"
+    )
+
+    st.metric(
+        "Confidence",
+        f"{confidence * 100:.2f}%"
+    )
+
+    if confidence < 0.50:
+
+        st.warning(
+            "⚠️ The model is not very confident about this prediction."
         )
 
-        st.metric(
-            "Confidence",
-            f"{confidence * 100:.2f}%"
-        )
+    # 🐾 INFORMACIÓN DE LA RAZA
+    if predicted_class in breed_info:
 
-        if confidence < 0.50:
+        info = breed_info[predicted_class]
 
-            st.warning(
-                "⚠️ The model is not very confident about this prediction."
-            )
+        st.markdown("## 🐾 Breed Information")
 
-        if predicted_class in breed_info:
+        colA, colB = st.columns(2)
 
-            st.info(
-                breed_info[predicted_class]
-            )
+        with colA:
+            st.metric("🌍 Origin", info["origin"])
+            st.metric("📏 Size", info["size"])
+            st.metric("⚖️ Weight", info["weight"])
+            st.metric("⏳ Life Span", info["life_span"])
+
+        with colB:
+            st.metric("🏃 Exercise Needs", info["exercise"])
+            st.metric("👨‍👩‍👧 Good With Kids", info["good_with_kids"])
+
+        st.info(f"🧠 Temperament: {info['temperament']}")
+
+        st.success(info["description"])
 
     # ═════════════════════════════════════════════════════════════
     # 🏆 TOP 5 PREDICCIONES
