@@ -216,6 +216,111 @@ col_b.metric("Dog Breeds", "70")
 col_c.metric("Model", "EfficientNetB0")
 
 # ═════════════════════════════════════════════════════════════
+# 📚 REGISTERED BREEDS MENU
+# ═════════════════════════════════════════════════════════════
+
+registered_breeds = [
+    "Afghan",
+    "African Wild Dog",
+    "Airedale",
+    "American Hairless",
+    "American Spaniel",
+    "Basenji",
+    "Basset",
+    "Beagle",
+    "Bearded Collie",
+    "Bermaise",
+    "Bichon Frise",
+    "Blenheim",
+    "Bloodhound",
+    "Bluetick",
+    "Border Collie",
+    "Borzoi",
+    "Boston Terrier",
+    "Boxer",
+    "Bull Mastiff",
+    "Bull Terrier",
+    "Bulldog",
+    "Cairn",
+    "Chihuahua",
+    "Chinese Crested",
+    "Chow",
+    "Clumber",
+    "Cockapoo",
+    "Cocker",
+    "Collie",
+    "Corgi",
+    "Coyote",
+    "Dalmation",
+    "Dhole",
+    "Dingo",
+    "Doberman",
+    "Elk Hound",
+    "French Bulldog",
+    "German Sheperd",
+    "Golden Retriever",
+    "Great Dane",
+    "Great Perenees",
+    "Greyhound",
+    "Groenendael",
+    "Irish Spaniel",
+    "Irish Wolfhound",
+    "Japanese Spaniel",
+    "Komondor",
+    "Labradoodle",
+    "Labrador",
+    "Lhasa",
+    "Malinois",
+    "Maltese",
+    "Mex Hairless",
+    "Newfoundland",
+    "Pekinese",
+    "Pit Bull",
+    "Pomeranian",
+    "Poodle",
+    "Pug",
+    "Rhodesian",
+    "Rottweiler",
+    "Saint Bernard",
+    "Schnauzer",
+    "Scotch Terrier",
+    "Shar Pei",
+    "Shiba Inu",
+    "Shih Tzu",
+    "Siberian Husky",
+    "Vizsla",
+    "Yorkie"
+]
+
+st.markdown("---")
+
+if language == "Español":
+
+    st.subheader("📚 Razas Registradas")
+
+    selected_breed_menu = st.selectbox(
+        "Selecciona una raza:",
+        registered_breeds
+    )
+
+    st.success(
+        f"🐶 Raza seleccionada: {selected_breed_menu}"
+    )
+
+else:
+
+    st.subheader("📚 Registered Dog Breeds")
+
+    selected_breed_menu = st.selectbox(
+        "Select a breed:",
+        registered_breeds
+    )
+
+    st.success(
+        f"🐶 Selected breed: {selected_breed_menu}"
+    )
+
+# ═════════════════════════════════════════════════════════════
 # 📤 IMAGE INPUT
 # ═════════════════════════════════════════════════════════════
 
