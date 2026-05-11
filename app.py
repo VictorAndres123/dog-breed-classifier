@@ -262,7 +262,9 @@ if uploaded_file is not None:
         if predicted_class in breed_info:
             st.info(breed_info[predicted_class])
 
+    # ═════════════════════════════════════════════════════════════
     # 🏆 TOP 5 PREDICCIONES
+    # ═════════════════════════════════════════════════════════════
 
     st.markdown("---")
 
@@ -276,7 +278,9 @@ if uploaded_file is not None:
 
         breed = class_names[idx]
 
-        prob = float(prediction[0][idx] * 100)
+        prob = float(
+            prediction[0][idx] * 100
+        )
 
         top_data.append({
             "Breed": breed.replace("_", " ").title(),
