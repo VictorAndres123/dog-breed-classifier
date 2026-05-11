@@ -207,25 +207,43 @@ if uploaded_file is not None or camera_image is not None:
     confidence = np.max(prediction)
 
     # 📊 RESULTADOS
+    with col2:
 
-with col2:
+        st.markdown("## 🎯 Prediction")
 
-    st.markdown("## 🎯 Prediction")
-
-    st.success(
-        f"### {predicted_class.replace('_', ' ').title()}"
-    )
-
-    st.metric(
-        "Confidence",
-        f"{confidence * 100:.2f}%"
-    )
-
-    if confidence < 0.50:
-
-        st.warning(
-            "⚠️ The model is not very confident about this prediction."
+        st.success(
+            f"### {predicted_class.replace('_', ' ').title()}"
         )
+
+        st.metric(
+            "Confidence",
+            f"{confidence * 100:.2f}%"
+        )
+
+        if confidence < 0.50:
+
+            st.warning(
+                "⚠️ The model is not very confident about this prediction."
+            )
+
+        # 🐾 PREGUNTAS SOBRE LA RAZA
+
+        if predicted_class in breed_info:
+
+            st.markdown("## 🐾 Ask About This Breed")
+
+            questions = list(
+                breed_info[predicted_class].keys()
+            )
+
+            selected_question = st.selectbox(
+                "Choose a question:",
+                questions
+            )
+
+            answer = breed_info[predicted_class][selected_question]
+
+            st.success(answer)
 
     # 🐾 INFORMACIÓN DE LA RAZA
     if predicted_class in breed_info:
