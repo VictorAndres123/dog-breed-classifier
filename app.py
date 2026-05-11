@@ -262,30 +262,56 @@ if uploaded_file is not None:
         if predicted_class in breed_info:
             st.info(breed_info[predicted_class])
 
-    # ═════════════════════════════════════════════════════════════
-# 🏆 TOP 5 PREDICCIONES
-# ═════════════════════════════════════════════════════════════
+    # 🏆 TOP 5 PREDICCIONES
 
-st.markdown("---")
+    st.markdown("---")
 
-st.subheader("🏆 Top 5 Predictions")
+    st.subheader("🏆 Top 5 Predictions")
 
-top_5_indices = prediction[0].argsort()[-5:][::-1]
+    top_5_indices = prediction[0].argsort()[-5:][::-1]
 
-top_data = []
+    top_data = []
 
-for idx in top_5_indices:
+    for idx in top_5_indices:
 
-    breed = class_names[idx]
+        breed = class_names[idx]
 
-    prob = float(prediction[0][idx] * 100)
+        prob = float(prediction[0][idx] * 100)
 
-    top_data.append({
-        "Breed": breed.replace("_", " ").title(),
-        "Confidence": round(prob, 2)
-    })
+        top_data.append({
+            "Breed": breed.replace("_", " ").title(),
+            "Confidence": round(prob, 2)
+        })
 
-df = pd.DataFrame(top_data)
+    df = pd.DataFrame(top_data)
+
+    # 📊 GRÁFICO INTERACTIVO
+
+    fig = px.bar(
+        df,
+        x="Confidence",
+        y="Breed",
+        orientation="h",
+        text="Confidence",
+        title="Top 5 Most Probable Breeds"
+    )
+
+    fig.update_layout(
+        height=500,
+        yaxis={'categoryorder':'total ascending'}
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+    # 📋 TABLA
+
+    st.dataframe(
+        df,
+        use_container_width=True
+    )
 
 # 📊 GRÁFICO INTERACTIVO
 
