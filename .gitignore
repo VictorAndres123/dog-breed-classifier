@@ -1,56 +1,34 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# Virtual environments
+venv*/
+venv_new/
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Large model files
+*.pth
+
+# Data directories
+dataset/
+data/
+
+# Logs
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Egg info
+*.egg-info/
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Datasets (son muy pesados)
-dataset/
-dataset_10_breeds/
-
-# Modelos entrenados (son pesados)
-models/*.keras
-models/*.h5
-models/*.pt
-
-# Archivos temporales
-*.tmp
-*.log
-.pytest_cache/
-
-# Reportes HTML (opcional)
-# reports/
