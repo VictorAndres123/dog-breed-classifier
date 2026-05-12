@@ -320,8 +320,7 @@ col_c.metric("Model", "EfficientNetB0")
 st.markdown("---")
 
 if language == "Español":
-    st.subheader("📚 Razas Registradas")
-    st.markdown("Selecciona una de las razas disponibles en el modelo:")
+    st.subheader("📚 Razas Registradas en nuestro modelo")
 else:
     st.subheader("📚 Registered Dog Breeds")
     st.markdown("Browse all breeds available in the trained model:")
