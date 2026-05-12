@@ -9,15 +9,29 @@ __pycache__/
 *.pyd
 .Python
 
-# Large model files
-*.pth
-
-# Data directories
-dataset/
-data/
-
-# Logs
+# Logs and temporary files
 logs/
+
+# Dataset and data directories
+data/
+dataset/
+
+# Old or backup model formats
+models/dog_classifier*.h5
+models/dog_classifier*.keras
+models/dog_classifier_weights.weights.h5
+
+# Training artifacts and archive code
+backup_scripts/
+src/
+requirements_training.txt
+pyproject.toml
+notebooks/
+reports/
+archive/
+
+# Keep the deployed model only
+!models/best_efficientnet_b0.pth
 
 # Jupyter
 .ipynb_checkpoints/
@@ -25,10 +39,10 @@ logs/
 # Egg info
 *.egg-info/
 
-# IDE
+# IDE settings
 .vscode/
 .idea/
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
