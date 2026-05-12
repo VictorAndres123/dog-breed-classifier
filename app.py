@@ -321,23 +321,32 @@ st.markdown("---")
 
 if language == "Español":
     st.subheader("📚 Razas Registradas")
-    selected_breed_menu = st.selectbox("Selecciona una raza:", registered_breeds)
-    st.success(f"🐶 Raza seleccionada: {selected_breed_menu}")
+    st.markdown("Selecciona una de las razas disponibles en el modelo:")
 else:
     st.subheader("📚 Registered Dog Breeds")
-    selected_breed_menu = st.selectbox("Select a breed:", registered_breeds)
-    st.success(f"🐶 Selected breed: {selected_breed_menu}")
+    st.markdown("Browse all breeds available in the trained model:")
+
+breeds_per_column = 19
+breed_columns = st.columns(3)
+for idx, column in enumerate(breed_columns):
+    start = idx * breeds_per_column
+    end = start + breeds_per_column
+    column.markdown("\n".join(f"- {breed}" for breed in registered_breeds[start:end]))
 
 # ═════════════════════════════════════════════════════════════
 # 📤 IMAGE INPUT
 # ═════════════════════════════════════════════════════════════
 
 uploaded_file = st.file_uploader(upload_text, type=["jpg", "jpeg", "png"])
-camera_image  = st.camera_input(camera_text)
+
+camera_image = None
+with st.expander("📸 Cámara (opcional)", expanded=False):
+    st.write("Usa la cámara solo si quieres capturar una foto en tiempo real.")
+    camera_image = st.camera_input(camera_text)
 
 # ═════════════════════════════════════════════════════════════
 # 🔍 PREDICTION
-# ═════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════
 
 if uploaded_file is not None or camera_image is not None:
 
