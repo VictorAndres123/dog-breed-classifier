@@ -13,6 +13,7 @@ from torchvision import models, transforms
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from PIL import Image
 
 # ═════════════════════════════════════════════════════════════
@@ -44,6 +45,15 @@ if language == "Español":
     analyzing_text  = "🧠 La IA está analizando el perro..."
     warning_text    = "⚠️ El modelo no está muy seguro de esta predicción."
     top5_text       = "🏆 Top 5 Predicciones"
+    insights_text   = "🧠 Insight del modelo"
+    certainty_text  = "Nivel de certeza"
+    gap_text        = "Diferencia Top-1 vs Top-2"
+    tip_text        = "Recomendación"
+    gauge_text      = "🎛️ Breed Match Score"
+    profile_text    = "📌 Ficha rápida de la raza"
+    history_text    = "🕘 Historial de predicciones (sesión)"
+    clear_history_text = "Limpiar historial"
+    history_empty_text = "Aún no hay predicciones en esta sesión."
     ask_text        = "## 🐾 Preguntas sobre esta raza"
     choose_question = "Selecciona una pregunta:"
     footer_text     = "🚀 Desarrollado con PyTorch, EfficientNetB0 y Streamlit"
@@ -66,6 +76,15 @@ else:
     analyzing_text  = "🧠 AI is analyzing the dog..."
     warning_text    = "⚠️ The model is not very confident about this prediction."
     top5_text       = "🏆 Top 5 Predictions"
+    insights_text   = "🧠 Model Insight"
+    certainty_text  = "Certainty level"
+    gap_text        = "Top-1 vs Top-2 gap"
+    tip_text        = "Recommendation"
+    gauge_text      = "🎛️ Breed Match Score"
+    profile_text    = "📌 Quick breed profile"
+    history_text    = "🕘 Prediction history (session)"
+    clear_history_text = "Clear history"
+    history_empty_text = "No predictions in this session yet."
     ask_text        = "## 🐾 Ask About This Breed"
     choose_question = "Choose a question:"
     footer_text     = "🚀 Built with PyTorch, EfficientNetB0 and Streamlit"
@@ -218,6 +237,22 @@ registered_breeds = [
 
 assert len(class_names) == NUM_CLASSES, f"class_names tiene {len(class_names)}, esperados {NUM_CLASSES}"
 assert len(registered_breeds) == NUM_CLASSES
+
+breed_profiles = {
+    "chow": {"size": "Mediano", "energy": "Media", "life": "9-12 años"},
+    "labrador": {"size": "Grande", "energy": "Alta", "life": "10-12 años"},
+    "golden_retriever": {"size": "Grande", "energy": "Alta", "life": "10-12 años"},
+    "pug": {"size": "Pequeño", "energy": "Media", "life": "12-15 años"},
+    "siberian_husky": {"size": "Mediano", "energy": "Muy alta", "life": "12-14 años"},
+    "german_sheperd": {"size": "Grande", "energy": "Alta", "life": "9-13 años"},
+    "beagle": {"size": "Pequeño/Mediano", "energy": "Alta", "life": "12-15 años"},
+    "bulldog": {"size": "Mediano", "energy": "Baja", "life": "8-10 años"},
+    "chihuahua": {"size": "Pequeño", "energy": "Media", "life": "14-16 años"},
+    "rottweiler": {"size": "Grande", "energy": "Media/Alta", "life": "9-10 años"},
+}
+
+if "prediction_history" not in st.session_state:
+    st.session_state.prediction_history = []
 
 # ═════════════════════════════════════════════════════════════
 # 🔄 PREPROCESAMIENTO — igual que augmentation.py val_transforms
@@ -401,7 +436,86 @@ if uploaded_file is not None or camera_image is not None:
     )
     fig.update_layout(height=500, yaxis={"categoryorder": "total ascending"})
     st.plotly_chart(fig, use_container_width=True)
-    st.dataframe(df, use_container_width=True)
+
+    top1_conf = float(df.iloc[0]["Confidence"])
+    top2_conf = float(df.iloc[1]["Confidence"])
+    confidence_gap = round(top1_conf - top2_conf, 2)
+
+    if top1_conf >= 85:
+        certainty_level = "Alta" if language == "Español" else "High"
+    elif top1_conf >= 60:
+        certainty_level = "Media" if language == "Español" else "Medium"
+    else:
+        certainty_level = "Baja" if language == "Español" else "Low"
+
+    if language == "Español":
+        recommendation = (
+            "La predicción es robusta. Puedes confiar en el resultado principal."
+            if confidence_gap >= 20 else
+            "Hay razas muy similares. Revisa el Top-5 o sube otra foto con mejor luz."
+        )
+    else:
+        recommendation = (
+            "Prediction looks robust. You can trust the top result."
+            if confidence_gap >= 20 else
+            "Breeds look visually similar. Check Top-5 or upload a clearer photo."
+        )
+
+    st.markdown(f"### {insights_text}")
+    i_col1, i_col2, i_col3 = st.columns(3)
+    i_col1.metric(certainty_text, certainty_level)
+    i_col2.metric(gap_text, f"{confidence_gap:.2f}%")
+    i_col3.metric(tip_text, "Top-1" if confidence_gap >= 20 else "Top-5")
+    st.info(recommendation)
+
+    score_value = round((top1_conf * 0.7) + (min(confidence_gap, 30) * (30 / 30)), 2)
+    score_value = min(score_value, 100)
+
+    st.markdown(f"### {gauge_text}")
+    gauge = go.Figure(
+        go.Indicator(
+            mode="gauge+number",
+            value=score_value,
+            number={"suffix": "%"},
+            gauge={
+                "axis": {"range": [0, 100]},
+                "bar": {"color": "#00D4AA"},
+                "steps": [
+                    {"range": [0, 50], "color": "#3A3A3A"},
+                    {"range": [50, 75], "color": "#4E5D6C"},
+                    {"range": [75, 100], "color": "#2A9D8F"},
+                ],
+            },
+            title={"text": "Match Strength" if language == "English" else "Fuerza de coincidencia"},
+        )
+    )
+    gauge.update_layout(height=280, margin=dict(l=20, r=20, t=50, b=20))
+    st.plotly_chart(gauge, use_container_width=True)
+
+    st.markdown(f"### {profile_text}")
+    profile = breed_profiles.get(predicted_class, {"size": "N/D", "energy": "N/D", "life": "N/D"})
+    p_col1, p_col2, p_col3 = st.columns(3)
+    p_col1.metric("Tamaño" if language == "Español" else "Size", profile["size"])
+    p_col2.metric("Energía" if language == "Español" else "Energy", profile["energy"])
+    p_col3.metric("Vida" if language == "Español" else "Life span", profile["life"])
+
+    st.session_state.prediction_history.append(
+        {
+            "Breed": predicted_class.replace("_", " ").title(),
+            "Confidence": round(top1_conf, 2),
+            "Score": score_value,
+        }
+    )
+
+    st.markdown("---")
+    st.subheader(history_text)
+    if st.button(clear_history_text):
+        st.session_state.prediction_history = []
+    if st.session_state.prediction_history:
+        history_df = pd.DataFrame(st.session_state.prediction_history)
+        st.dataframe(history_df.tail(10), use_container_width=True)
+    else:
+        st.caption(history_empty_text)
 
 # ═════════════════════════════════════════════════════════════
 # 🔚 FOOTER
