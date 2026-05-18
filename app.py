@@ -42,6 +42,7 @@ TEXTS = {
         "analyzing": "🧠 AI is analyzing the dog...",
         "warning": "⚠️ The model is not very confident about this prediction.",
         "top5": "🏆 Top 5 Predictions",
+        "confidence_distribution": "📊 Confidence Distribution",
         "history": "🕘 Prediction history (session)",
         "clear_history": "Clear history",
         "history_empty": "No predictions in this session yet.",
@@ -70,6 +71,7 @@ TEXTS = {
         "analyzing": "🧠 La IA está analizando el perro...",
         "warning": "⚠️ El modelo no está muy seguro de esta predicción.",
         "top5": "🏆 Top 5 Predicciones",
+        "confidence_distribution": "📊 Distribución de confianza",
         "history": "🕘 Historial de predicciones (sesión)",
         "clear_history": "Limpiar historial",
         "history_empty": "Aún no hay predicciones en esta sesión.",
@@ -427,6 +429,19 @@ if uploaded_file is not None or camera_image is not None:
             t["confidence"]: round(top1_conf, 2),
         }
     )
+
+    st.markdown("---")
+    st.subheader(t["confidence_distribution"])
+    conf_values = [entry[t["confidence"]] for entry in st.session_state.prediction_history]
+    conf_df = pd.DataFrame({t["confidence"]: conf_values})
+    conf_fig = px.histogram(
+        conf_df,
+        x=t["confidence"],
+        nbins=10,
+        title=t["confidence_distribution"],
+    )
+    conf_fig.update_layout(height=380)
+    st.plotly_chart(conf_fig, use_container_width=True)
 
     st.markdown("---")
     st.subheader(t["history"])
