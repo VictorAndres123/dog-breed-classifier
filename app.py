@@ -399,7 +399,6 @@ if uploaded_file is not None or camera_image is not None:
     with col2:
         st.markdown(t["prediction"])
         st.success(f"### {registered_breeds[predicted_index]}")
-        st.metric(t["confidence"], f"{confidence * 100:.2f}%")
 
         if confidence < 0.50:
             st.warning(t["warning"])
@@ -466,13 +465,36 @@ if uploaded_file is not None or camera_image is not None:
     if st.button(t["clear_history"]):
         st.session_state.prediction_history = []
     if st.session_state.prediction_history:
-        history_df = pd.DataFrame(st.session_state.prediction_history)
-        history_df = history_df.rename(
-            columns={
-                HISTORY_BREED_KEY: t["col_breed"],
-                HISTORY_CONFIDENCE_KEY: t["confidence"],
-            }
-        )
+        normalized_history = []
+        for entry in st.session_state.prediction_history:
+            if not isinstance(entry, dict):
+                continue
+
+            breed_value = (
+                entry.get(HISTORY_BREED_KEY)
+                or entry.get("Breed")
+                or entry.get("Raza")
+                or "-"
+            )
+            confidence_value = (
+                entry.get(HISTORY_CONFIDENCE_KEY)
+                if entry.get(HISTORY_CONFIDENCE_KEY) is not None
+                else entry.get("Confidence", entry.get("Confianza", 0.0))
+            )
+
+            try:
+                confidence_value = round(float(confidence_value), 2)
+            except (TypeError, ValueError):
+                confidence_value = 0.0
+
+            normalized_history.append(
+                {
+                    t["col_breed"]: str(breed_value),
+                    t["confidence"]: confidence_value,
+                }
+            )
+
+        history_df = pd.DataFrame(normalized_history)
         st.dataframe(history_df.tail(10), use_container_width=True)
     else:
         st.caption(t["history_empty"])
