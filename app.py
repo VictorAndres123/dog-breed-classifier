@@ -47,18 +47,7 @@ if language == "Español":
     history_text    = "🕘 Historial de predicciones (sesión)"
     clear_history_text = "Limpiar historial"
     history_empty_text = "Aún no hay predicciones en esta sesión."
-    ask_text        = "## 🐾 Preguntas sobre esta raza"
-    choose_question = "Selecciona una pregunta:"
     footer_text     = "🚀 Desarrollado con PyTorch, EfficientNetB0 y Streamlit"
-    questions = {
-        "🌍 Origen":                  "Esta raza tiene orígenes ligados a regiones específicas.",
-        "⏳ Tiempo de vida":           "La esperanza de vida promedio suele ser entre 10 y 15 años.",
-        "🏙️ ¿Ciudad o campo?":        "Algunas razas se adaptan mejor a apartamentos y otras al campo.",
-        "👨‍👩‍👧 ¿Buena con niños?":       "Muchas razas son amigables y protectoras con familias.",
-        "🏃 Necesidad de ejercicio":   "Las razas activas requieren caminatas y ejercicio diario.",
-        "🧠 Inteligencia":             "Esta raza es conocida por su capacidad de aprendizaje.",
-        "🛡️ Temperamento":             "El temperamento puede variar entre tranquilo y energético."
-    }
 else:
     title_text      = "🐶 AI Dog Breed Classifier"
     subtitle_text   = "Upload a dog image and the AI will identify the breed."
@@ -72,18 +61,7 @@ else:
     history_text    = "🕘 Prediction history (session)"
     clear_history_text = "Clear history"
     history_empty_text = "No predictions in this session yet."
-    ask_text        = "## 🐾 Ask About This Breed"
-    choose_question = "Choose a question:"
     footer_text     = "🚀 Built with PyTorch, EfficientNetB0 and Streamlit"
-    questions = {
-        "🌍 Origin":                        "This breed has origins linked to specific regions.",
-        "⏳ Life Span":                      "Average life expectancy is usually between 10 and 15 years.",
-        "🏙️ Better for City or Countryside?": "Some breeds adapt better to apartments while others prefer open spaces.",
-        "👨‍👩‍👧 Good With Kids?":                "Most breeds are affectionate and protective with families.",
-        "🏃 Exercise Needs":                 "Active breeds require daily walks and exercise.",
-        "🧠 Intelligence":                   "This breed is known for learning ability and obedience.",
-        "🛡️ Temperament":                   "Temperament can range from calm to energetic."
-    }
 
 # ═════════════════════════════════════════════════════════════
 # 🎨 CSS
@@ -403,10 +381,6 @@ if uploaded_file is not None or camera_image is not None:
 
         if confidence < 0.50:
             st.warning(warning_text)
-
-        st.markdown(ask_text)
-        selected_question = st.selectbox(choose_question, list(questions.keys()))
-        st.info(questions[selected_question])
 
     # TOP 5
     st.markdown("---")
