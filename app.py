@@ -29,39 +29,68 @@ st.set_page_config(
 # 🌍 LANGUAGE SELECTOR
 # ═════════════════════════════════════════════════════════════
 
-language = st.sidebar.selectbox(
-    "🌍 Language / Idioma",
-    ["English", "Español"]
-)
+language = st.sidebar.selectbox("🌍 Language / Idioma", ["English", "Español"])
 
-if language == "Español":
-    title_text      = "🐶 Clasificador de Razas de Perros"
-    subtitle_text   = "Sube una imagen de un perro y la IA identificará la raza."
-    upload_text     = "📤 Subir imagen"
-    camera_text     = "📸 Tomar foto"
-    prediction_text = "## 🎯 Predicción"
-    confidence_text = "Confianza"
-    analyzing_text  = "🧠 La IA está analizando el perro..."
-    warning_text    = "⚠️ El modelo no está muy seguro de esta predicción."
-    top5_text       = "🏆 Top 5 Predicciones"
-    history_text    = "🕘 Historial de predicciones (sesión)"
-    clear_history_text = "Limpiar historial"
-    history_empty_text = "Aún no hay predicciones en esta sesión."
-    footer_text     = "🚀 Desarrollado con PyTorch, EfficientNetB0 y Streamlit"
-else:
-    title_text      = "🐶 AI Dog Breed Classifier"
-    subtitle_text   = "Upload a dog image and the AI will identify the breed."
-    upload_text     = "📤 Upload a dog image"
-    camera_text     = "📸 Take a picture of a dog"
-    prediction_text = "## 🎯 Prediction"
-    confidence_text = "Confidence"
-    analyzing_text  = "🧠 AI is analyzing the dog..."
-    warning_text    = "⚠️ The model is not very confident about this prediction."
-    top5_text       = "🏆 Top 5 Predictions"
-    history_text    = "🕘 Prediction history (session)"
-    clear_history_text = "Clear history"
-    history_empty_text = "No predictions in this session yet."
-    footer_text     = "🚀 Built with PyTorch, EfficientNetB0 and Streamlit"
+TEXTS = {
+    "English": {
+        "title": "🐶 AI Dog Breed Classifier",
+        "subtitle": "Upload a dog image and the AI will identify the breed.",
+        "upload": "📤 Upload a dog image",
+        "camera_input": "📸 Take a picture of a dog",
+        "prediction": "## 🎯 Prediction",
+        "confidence": "Confidence",
+        "analyzing": "🧠 AI is analyzing the dog...",
+        "warning": "⚠️ The model is not very confident about this prediction.",
+        "top5": "🏆 Top 5 Predictions",
+        "history": "🕘 Prediction history (session)",
+        "clear_history": "Clear history",
+        "history_empty": "No predictions in this session yet.",
+        "footer": "🚀 Built with PyTorch, EfficientNetB0 and Streamlit",
+        "model_not_found": "❌ Model not found at '{model_path}'",
+        "loading_error": "❌ Error loading model",
+        "sidebar_title": "🐾 AI Dog Classifier",
+        "sidebar_features": "### Features\n✅ Deep Learning  \n✅ PyTorch  \n✅ Streamlit  \n✅ Top 5 Predictions  \n✅ Real-time Classification  \n✅ 55 Dog Breeds  \n✅ Camera Support",
+        "metric_accuracy": "Accuracy",
+        "metric_breeds": "Dog Breeds",
+        "metric_model": "Model",
+        "registered_title": "📚 Registered Dog Breeds",
+        "registered_caption": "Explore all 55 breeds available in the trained model.",
+        "camera_expander": "📸 Camera (optional)",
+        "camera_help": "Use the camera only if you want to take a real-time photo.",
+        "dog_image": "Dog Image",
+        "col_breed": "Breed",
+    },
+    "Español": {
+        "title": "🐶 Clasificador de Razas de Perros",
+        "subtitle": "Sube una imagen de un perro y la IA identificará la raza.",
+        "upload": "📤 Subir imagen de perro",
+        "camera_input": "📸 Tomar una foto del perro",
+        "prediction": "## 🎯 Predicción",
+        "confidence": "Confianza",
+        "analyzing": "🧠 La IA está analizando el perro...",
+        "warning": "⚠️ El modelo no está muy seguro de esta predicción.",
+        "top5": "🏆 Top 5 Predicciones",
+        "history": "🕘 Historial de predicciones (sesión)",
+        "clear_history": "Limpiar historial",
+        "history_empty": "Aún no hay predicciones en esta sesión.",
+        "footer": "🚀 Desarrollado con PyTorch, EfficientNetB0 y Streamlit",
+        "model_not_found": "❌ No se encontró el modelo en '{model_path}'",
+        "loading_error": "❌ Error al cargar el modelo",
+        "sidebar_title": "🐾 Clasificador IA de Perros",
+        "sidebar_features": "### Funciones\n✅ Deep Learning  \n✅ PyTorch  \n✅ Streamlit  \n✅ Top 5 predicciones  \n✅ Clasificación en tiempo real  \n✅ 55 razas de perro  \n✅ Soporte de cámara",
+        "metric_accuracy": "Precisión",
+        "metric_breeds": "Razas",
+        "metric_model": "Modelo",
+        "registered_title": "📚 Razas registradas en nuestro modelo",
+        "registered_caption": "Explora las 55 razas disponibles en el modelo entrenado.",
+        "camera_expander": "📸 Cámara (opcional)",
+        "camera_help": "Usa la cámara solo si quieres capturar una foto en tiempo real.",
+        "dog_image": "Imagen del perro",
+        "col_breed": "Raza",
+    },
+}
+
+t = TEXTS[language]
 
 # ═════════════════════════════════════════════════════════════
 # 🎨 CSS
@@ -267,10 +296,10 @@ def load_model():
 try:
     model, device = load_model()
 except FileNotFoundError:
-    st.error(f"❌ No se encontró el modelo en '{MODEL_PATH}'")
+    st.error(t["model_not_found"].format(model_path=MODEL_PATH))
     st.stop()
 except Exception as e:
-    st.error("❌ Error cargando el modelo")
+    st.error(t["loading_error"])
     st.error(str(e))
     st.stop()
 
@@ -278,37 +307,24 @@ except Exception as e:
 # 📋 SIDEBAR
 # ═════════════════════════════════════════════════════════════
 
-st.sidebar.title("🐾 AI Dog Classifier")
-st.sidebar.markdown("""
-### Features
-✅ Deep Learning  
-✅ PyTorch  
-✅ Streamlit  
-✅ Top 5 Predictions  
-✅ Real-time Classification  
-✅ 55 Dog Breeds  
-✅ Camera Support
-""")
+st.sidebar.title(t["sidebar_title"])
+st.sidebar.markdown(t["sidebar_features"])
 # ═════════════════════════════════════════════════════════════
 # 🏠 MAIN INTERFACE
 # ═════════════════════════════════════════════════════════════
 
-st.title(title_text)
-st.markdown(subtitle_text)
+st.title(t["title"])
+st.markdown(t["subtitle"])
 
 col_a, col_b, col_c = st.columns(3)
-col_a.metric("Accuracy", "~90%")
-col_b.metric("Dog Breeds", "55")
-col_c.metric("Model", "EfficientNetB0")
+col_a.metric(t["metric_accuracy"], "~90%")
+col_b.metric(t["metric_breeds"], "55")
+col_c.metric(t["metric_model"], "EfficientNetB0")
 
 st.markdown("---")
 
-if language == "Español":
-    st.subheader("📚 Razas Registradas en nuestro modelo")
-    st.caption("Explora las 55 razas disponibles en el modelo entrenado.")
-else:
-    st.subheader("📚 Registered Dog Breeds")
-    st.caption("Explore all 55 breeds available in the trained model.")
+st.subheader(t["registered_title"])
+st.caption(t["registered_caption"])
 
 st.markdown(
     """
@@ -341,12 +357,12 @@ for idx, column in enumerate(breed_columns):
 # 📤 IMAGE INPUT
 # ═════════════════════════════════════════════════════════════
 
-uploaded_file = st.file_uploader(upload_text, type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader(t["upload"], type=["jpg", "jpeg", "png"])
 
 camera_image = None
-with st.expander("📸 Cámara (opcional)", expanded=False):
-    st.write("Usa la cámara solo si quieres capturar una foto en tiempo real.")
-    camera_image = st.camera_input(camera_text)
+with st.expander(t["camera_expander"], expanded=False):
+    st.write(t["camera_help"])
+    camera_image = st.camera_input(t["camera_input"])
 
 # ═════════════════════════════════════════════════════════════
 # 🔍 PREDICTION
@@ -360,12 +376,12 @@ if uploaded_file is not None or camera_image is not None:
         image = Image.open(
             uploaded_file if uploaded_file is not None else camera_image
         ).convert("RGB")
-        st.image(image, caption="Dog Image", use_container_width=True)
+        st.image(image, caption=t["dog_image"], use_container_width=True)
 
     # Preprocesar igual que val_transforms de augmentation.py
     tensor = transform(image).unsqueeze(0).to(device)
 
-    with st.spinner(analyzing_text):
+    with st.spinner(t["analyzing"]):
         with torch.no_grad():
             outputs = model(tensor)
             probs   = torch.softmax(outputs, dim=1).cpu().numpy()[0]
@@ -375,56 +391,56 @@ if uploaded_file is not None or camera_image is not None:
     confidence      = float(probs[predicted_index])
 
     with col2:
-        st.markdown(prediction_text)
-        st.success(f"### {predicted_class.replace('_', ' ').title()}")
-        st.metric(confidence_text, f"{confidence * 100:.2f}%")
+        st.markdown(t["prediction"])
+        st.success(f"### {registered_breeds[predicted_index]}")
+        st.metric(t["confidence"], f"{confidence * 100:.2f}%")
 
         if confidence < 0.50:
-            st.warning(warning_text)
+            st.warning(t["warning"])
 
     # TOP 5
     st.markdown("---")
-    st.subheader(top5_text)
+    st.subheader(t["top5"])
 
     top5_idx = probs.argsort()[-5:][::-1]
     top_data = [
         {
-            "Breed":      class_names[i].replace("_", " ").title(),
-            "Confidence": round(float(probs[i]) * 100, 2)
+            t["col_breed"]: registered_breeds[i],
+            t["confidence"]: round(float(probs[i]) * 100, 2)
         }
         for i in top5_idx
     ]
     df = pd.DataFrame(top_data)
 
     fig = px.bar(
-        df, x="Confidence", y="Breed", orientation="h",
-        text="Confidence", title=top5_text
+        df, x=t["confidence"], y=t["col_breed"], orientation="h",
+        text=t["confidence"], title=t["top5"]
     )
     fig.update_layout(height=500, yaxis={"categoryorder": "total ascending"})
     st.plotly_chart(fig, use_container_width=True)
 
-    top1_conf = float(df.iloc[0]["Confidence"])
+    top1_conf = float(df.iloc[0][t["confidence"]])
 
     st.session_state.prediction_history.append(
         {
-            "Breed": predicted_class.replace("_", " ").title(),
-            "Confidence": round(top1_conf, 2),
+            t["col_breed"]: registered_breeds[predicted_index],
+            t["confidence"]: round(top1_conf, 2),
         }
     )
 
     st.markdown("---")
-    st.subheader(history_text)
-    if st.button(clear_history_text):
+    st.subheader(t["history"])
+    if st.button(t["clear_history"]):
         st.session_state.prediction_history = []
     if st.session_state.prediction_history:
         history_df = pd.DataFrame(st.session_state.prediction_history)
         st.dataframe(history_df.tail(10), use_container_width=True)
     else:
-        st.caption(history_empty_text)
+        st.caption(t["history_empty"])
 
 # ═════════════════════════════════════════════════════════════
 # 🔚 FOOTER
 # ═════════════════════════════════════════════════════════════
 
 st.markdown("---")
-st.caption(footer_text)
+st.caption(t["footer"])
