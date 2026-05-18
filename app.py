@@ -13,6 +13,7 @@ from torchvision import models, transforms
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from PIL import Image
 
 # ═════════════════════════════════════════════════════════════
@@ -42,7 +43,7 @@ TEXTS = {
         "analyzing": "🧠 AI is analyzing the dog...",
         "warning": "⚠️ The model is not very confident about this prediction.",
         "top5": "🏆 Top 5 Predictions",
-        "confidence_distribution": "📊 Confidence Distribution",
+        "confidence_gauge": "📊 Top-1 Confidence Gauge",
         "history": "🕘 Prediction history (session)",
         "clear_history": "Clear history",
         "history_empty": "No predictions in this session yet.",
@@ -71,7 +72,7 @@ TEXTS = {
         "analyzing": "🧠 La IA está analizando el perro...",
         "warning": "⚠️ El modelo no está muy seguro de esta predicción.",
         "top5": "🏆 Top 5 Predicciones",
-        "confidence_distribution": "📊 Distribución de confianza",
+        "confidence_gauge": "📊 Velocímetro de confianza Top-1",
         "history": "🕘 Historial de predicciones (sesión)",
         "clear_history": "Limpiar historial",
         "history_empty": "Aún no hay predicciones en esta sesión.",
@@ -236,6 +237,9 @@ assert len(registered_breeds) == NUM_CLASSES
 
 if "prediction_history" not in st.session_state:
     st.session_state.prediction_history = []
+
+HISTORY_BREED_KEY = "breed"
+HISTORY_CONFIDENCE_KEY = "confidence"
 
 # ═════════════════════════════════════════════════════════════
 # 🔄 PREPROCESAMIENTO — igual que augmentation.py val_transforms
@@ -425,23 +429,37 @@ if uploaded_file is not None or camera_image is not None:
 
     st.session_state.prediction_history.append(
         {
-            t["col_breed"]: registered_breeds[predicted_index],
-            t["confidence"]: round(top1_conf, 2),
+            HISTORY_BREED_KEY: registered_breeds[predicted_index],
+            HISTORY_CONFIDENCE_KEY: round(top1_conf, 2),
         }
     )
 
     st.markdown("---")
-    st.subheader(t["confidence_distribution"])
-    conf_values = [entry[t["confidence"]] for entry in st.session_state.prediction_history]
-    conf_df = pd.DataFrame({t["confidence"]: conf_values})
-    conf_fig = px.histogram(
-        conf_df,
-        x=t["confidence"],
-        nbins=10,
-        title=t["confidence_distribution"],
+    st.subheader(t["confidence_gauge"])
+    gauge_fig = go.Figure(
+        go.Indicator(
+            mode="gauge+number",
+            value=top1_conf,
+            number={"suffix": "%"},
+            gauge={
+                "axis": {"range": [0, 100]},
+                "bar": {"color": "#4AA3FF"},
+                "steps": [
+                    {"range": [0, 50], "color": "#5A1F1F"},
+                    {"range": [50, 80], "color": "#5A4A1F"},
+                    {"range": [80, 100], "color": "#1F5A35"},
+                ],
+                "threshold": {
+                    "line": {"color": "#FFFFFF", "width": 4},
+                    "thickness": 0.8,
+                    "value": top1_conf,
+                },
+            },
+            title={"text": t["confidence"]},
+        )
     )
-    conf_fig.update_layout(height=380)
-    st.plotly_chart(conf_fig, use_container_width=True)
+    gauge_fig.update_layout(height=360)
+    st.plotly_chart(gauge_fig, use_container_width=True)
 
     st.markdown("---")
     st.subheader(t["history"])
@@ -449,6 +467,12 @@ if uploaded_file is not None or camera_image is not None:
         st.session_state.prediction_history = []
     if st.session_state.prediction_history:
         history_df = pd.DataFrame(st.session_state.prediction_history)
+        history_df = history_df.rename(
+            columns={
+                HISTORY_BREED_KEY: t["col_breed"],
+                HISTORY_CONFIDENCE_KEY: t["confidence"],
+            }
+        )
         st.dataframe(history_df.tail(10), use_container_width=True)
     else:
         st.caption(t["history_empty"])
