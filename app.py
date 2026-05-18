@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from PIL import Image
+from PIL import Image, ImageOps
 
 # ═════════════════════════════════════════════════════════════
 # 🎨 CONFIGURACIÓN STREAMLIT
@@ -113,6 +113,7 @@ h1, h2, h3 { color: white; }
 
 NUM_CLASSES = 55
 IMG_SIZE    = 224
+DISPLAY_IMAGE_SIZE = 700
 
 # ⚠️ Scottish_deerhound va en índice 0 porque la S mayúscula
 #    ordena antes que las minúsculas en Python/os.listdir
@@ -382,7 +383,12 @@ if uploaded_file is not None or camera_image is not None:
         image = Image.open(
             uploaded_file if uploaded_file is not None else camera_image
         ).convert("RGB")
-        st.image(image, caption=t["dog_image"], use_container_width=True)
+        display_image = ImageOps.fit(
+            image,
+            (DISPLAY_IMAGE_SIZE, DISPLAY_IMAGE_SIZE),
+            method=Image.Resampling.LANCZOS,
+        )
+        st.image(display_image, caption=t["dog_image"], use_container_width=True)
 
     # Preprocesar igual que val_transforms de augmentation.py
     tensor = transform(image).unsqueeze(0).to(device)
