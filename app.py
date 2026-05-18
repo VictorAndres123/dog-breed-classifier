@@ -311,9 +311,6 @@ st.sidebar.markdown("""
 ✅ 55 Dog Breeds  
 ✅ Camera Support
 """)
-gpu_info = "🟢 GPU" if torch.cuda.is_available() else "🔵 CPU"
-st.sidebar.info(f"Device: {gpu_info}")
-
 # ═════════════════════════════════════════════════════════════
 # 🏠 MAIN INTERFACE
 # ═════════════════════════════════════════════════════════════
