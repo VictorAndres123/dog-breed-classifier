@@ -1,24 +1,19 @@
-"""
-🐶 AI DOG BREED CLASSIFIER
-Aplicación web con Streamlit + PyTorch (EfficientNetB0)
-"""
+"""Aplicacion Streamlit para clasificar razas de perros con EfficientNetB0."""
 
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-import streamlit as st
-import torch
-import torch.nn as nn
-from torchvision import models, transforms
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import streamlit as st
+import torch
+import torch.nn as nn
 from PIL import Image, ImageOps
+from torchvision import models, transforms
 
-# ═════════════════════════════════════════════════════════════
-# 🎨 CONFIGURACIÓN STREAMLIT
-# ═════════════════════════════════════════════════════════════
+# Configurar pagina de Streamlit
 
 st.set_page_config(
     page_title="🐶 AI Dog Breed Classifier",
@@ -26,9 +21,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# ═════════════════════════════════════════════════════════════
-# 🌍 LANGUAGE SELECTOR
-# ═════════════════════════════════════════════════════════════
+# Selector de idioma para toda la interfaz
 
 language = st.sidebar.selectbox("🌍 Language / Idioma", ["English", "Español"])
 
@@ -95,9 +88,7 @@ TEXTS = {
 
 t = TEXTS[language]
 
-# ═════════════════════════════════════════════════════════════
-# 🎨 CSS
-# ═════════════════════════════════════════════════════════════
+# Estilos visuales basicos de la app
 
 st.markdown("""
 <style>
@@ -107,16 +98,13 @@ h1, h2, h3 { color: white; }
 </style>
 """, unsafe_allow_html=True)
 
-# ═════════════════════════════════════════════════════════════
-# ⚙️ CLASES — orden exacto del dataset (sorted con mayúsculas primero)
-# ═════════════════════════════════════════════════════════════
+# Clases del modelo en el mismo orden usado al entrenar
 
 NUM_CLASSES = 55
 IMG_SIZE    = 224
 DISPLAY_IMAGE_SIZE = 700
 
-# ⚠️ Scottish_deerhound va en índice 0 porque la S mayúscula
-#    ordena antes que las minúsculas en Python/os.listdir
+# Mantener este orden evita errores al mapear indice -> raza
 class_names = [
     "Scottish_deerhound",  #  0
     "afghan",              #  1
@@ -242,9 +230,7 @@ if "prediction_history" not in st.session_state:
 HISTORY_BREED_KEY = "breed"
 HISTORY_CONFIDENCE_KEY = "confidence"
 
-# ═════════════════════════════════════════════════════════════
-# 🔄 PREPROCESAMIENTO — igual que augmentation.py val_transforms
-# ═════════════════════════════════════════════════════════════
+# Transformar imagen para que el modelo pueda analizarla
 
 transform = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
@@ -255,15 +241,15 @@ transform = transforms.Compose([
     )
 ])
 
-# ═════════════════════════════════════════════════════════════
-# 🧠 ARQUITECTURA — copia exacta de model.py
-# ═════════════════════════════════════════════════════════════
+# Crear arquitectura EfficientNetB0 para inferencia
 
 class DogBreedClassifier(nn.Module):
     def __init__(self, num_classes=NUM_CLASSES):
         super().__init__()
+        # Backbone preentrenado: extrae rasgos visuales de la imagen
         self.backbone = models.efficientnet_b0(weights=None)
         in_features = self.backbone.classifier[1].in_features
+        # Cabezal final: convierte rasgos en probabilidades por raza
         self.backbone.classifier = nn.Sequential(
             nn.Dropout(p=0.2),
             nn.Linear(in_features, 1024),
@@ -277,20 +263,20 @@ class DogBreedClassifier(nn.Module):
             nn.Linear(512, num_classes)
         )
     def forward(self, x):
+        # Entrada: tensor [batch, 3, 224, 224] / Salida: logits [batch, clases]
         return self.backbone(x)
 
-# ═════════════════════════════════════════════════════════════
-# 🧠 CARGAR MODELO
-# ═════════════════════════════════════════════════════════════
+# Ruta del archivo .pth entrenado
 
 MODEL_PATH = "models/best_efficientnet_b0.pth"
 
 @st.cache_resource
 def load_model():
+    # Cargar pesos entrenados en CPU o GPU disponible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model  = DogBreedClassifier(num_classes=NUM_CLASSES)
     sd     = torch.load(MODEL_PATH, map_location=device)
-    # Soporta checkpoint completo o state_dict directo
+    # Soporta dos formatos: checkpoint completo o state_dict directo
     if isinstance(sd, dict) and "model_state_dict" in sd:
         sd = sd["model_state_dict"]
     elif isinstance(sd, dict) and "state_dict" in sd:
@@ -310,15 +296,11 @@ except Exception as e:
     st.error(str(e))
     st.stop()
 
-# ═════════════════════════════════════════════════════════════
-# 📋 SIDEBAR
-# ═════════════════════════════════════════════════════════════
+# Sidebar con informacion rapida
 
 st.sidebar.title(t["sidebar_title"])
 st.sidebar.markdown(t["sidebar_features"])
-# ═════════════════════════════════════════════════════════════
-# 🏠 MAIN INTERFACE
-# ═════════════════════════════════════════════════════════════
+# Interfaz principal
 
 st.title(t["title"])
 st.markdown(t["subtitle"])
@@ -360,9 +342,7 @@ for idx, column in enumerate(breed_columns):
         for breed in registered_breeds[start:end]:
             st.markdown(f"<div class='breed-pill'>{breed}</div>", unsafe_allow_html=True)
 
-# ═════════════════════════════════════════════════════════════
-# 📤 IMAGE INPUT
-# ═════════════════════════════════════════════════════════════
+# Cargar imagen desde archivo o camara
 
 uploaded_file = st.file_uploader(t["upload"], type=["jpg", "jpeg", "png"])
 
@@ -371,9 +351,7 @@ with st.expander(t["camera_expander"], expanded=False):
     st.write(t["camera_help"])
     camera_image = st.camera_input(t["camera_input"])
 
-# ═════════════════════════════════════════════════════════════
-# 🔍 PREDICTION
-# ═════════════════════════════════════════════════════
+# Realizar prediccion cuando exista una imagen
 
 if uploaded_file is not None or camera_image is not None:
 
@@ -390,7 +368,7 @@ if uploaded_file is not None or camera_image is not None:
         )
         st.image(display_image, caption=t["dog_image"], use_container_width=True)
 
-    # Preprocesar igual que val_transforms de augmentation.py
+    # Transformar imagen igual que en validacion
     tensor = transform(image).unsqueeze(0).to(device)
 
     with st.spinner(t["analyzing"]):
@@ -399,7 +377,6 @@ if uploaded_file is not None or camera_image is not None:
             probs   = torch.softmax(outputs, dim=1).cpu().numpy()[0]
 
     predicted_index = int(np.argmax(probs))
-    predicted_class = class_names[predicted_index]
     confidence      = float(probs[predicted_index])
 
     with col2:
@@ -409,7 +386,7 @@ if uploaded_file is not None or camera_image is not None:
         if confidence < 0.50:
             st.warning(t["warning"])
 
-    # TOP 5
+    # Top 5: mostrar las cinco razas con mayor probabilidad
     st.markdown("---")
     st.subheader(t["top5"])
 
@@ -432,6 +409,7 @@ if uploaded_file is not None or camera_image is not None:
 
     top1_conf = float(df.iloc[0][t["confidence"]])
 
+    # Guardar resultado top-1 en historial de la sesion
     st.session_state.prediction_history.append(
         {
             HISTORY_BREED_KEY: registered_breeds[predicted_index],
@@ -440,6 +418,7 @@ if uploaded_file is not None or camera_image is not None:
     )
 
     st.markdown("---")
+    # Mostrar confianza top-1 en formato velocimetro
     st.subheader(t["confidence_gauge"])
     gauge_fig = go.Figure(
         go.Indicator(
@@ -467,6 +446,7 @@ if uploaded_file is not None or camera_image is not None:
     st.plotly_chart(gauge_fig, use_container_width=True)
 
     st.markdown("---")
+    # Mostrar historial para comparar predicciones recientes
     st.subheader(t["history"])
     if st.button(t["clear_history"]):
         st.session_state.prediction_history = []
@@ -505,9 +485,7 @@ if uploaded_file is not None or camera_image is not None:
     else:
         st.caption(t["history_empty"])
 
-# ═════════════════════════════════════════════════════════════
-# 🔚 FOOTER
-# ═════════════════════════════════════════════════════════════
+# Pie de pagina
 
 st.markdown("---")
 st.caption(t["footer"])
